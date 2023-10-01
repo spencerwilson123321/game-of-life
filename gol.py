@@ -15,21 +15,23 @@ class Game:
         self.gamethread = None
 
     def in_bounds(self, index):
-        condition = 0 <= index <= len(self.cells)-1
-        return condition
+        return 0 <= index <= len(self.cells)-1
 
     def get_alive_neighbors(self, index):
         neighbor_positions = [index-self.rowsize-1, index-self.rowsize, index-self.rowsize+1,
                               index-1, index+1,
                               index+self.rowsize-1, index+self.rowsize, index+self.rowsize+1]
-        all_neighbors = [self.cells[index] for index in neighbor_positions if self.in_bounds(index)]
-        live_neighbors = list(filter(lambda cell: cell.alive, all_neighbors))
-        return live_neighbors
+        n = 0
+        for index in neighbor_positions:
+            if self.in_bounds(index):
+                if self.cells[index].alive:
+                    n += 1
+        return n
 
     def tick(self):
         states = []
         for i in range(0, len(self.cells)):
-            n = len(self.get_alive_neighbors(i))
+            n = self.get_alive_neighbors(i)
             if not self.cells[i].alive and n == 3:
                 states.append(True)
             elif self.cells[i].alive and (n == 2 or n == 3):
@@ -48,9 +50,7 @@ class Game:
     def gameloop(self):
         self.running = True
         while self.running:
-            print(f"This should run every {self.tickperiod} seconds")
             self.tick()
-        print("Game has stopped.")
 
     def stop(self):
         self.running = False
@@ -91,7 +91,6 @@ if __name__ == "__main__":
     num_cols = 10
     cells = []
     for y in range(num_rows):
-        row = []
         for x in range(num_cols):
             cells.append(Cell(grid, x, y))
     grid.pack()
