@@ -7,15 +7,16 @@ import threading
 class Game:
     def __init__(self, cells, rowsize, colsize):
         self.cells = cells
+        self.celllength = len(self.cells)
         self.rowsize = rowsize
         self.colsize = colsize
-        self.tickrate = 5.0
+        self.tickrate = 7.0
         self.tickperiod = 1.0 / self.tickrate
         self.running = False
         self.gamethread = None
 
     def in_bounds(self, index):
-        return 0 <= index <= len(self.cells)-1
+        return 0 <= index <= self.celllength-1
 
     def get_alive_neighbors(self, index):
         neighbor_positions = [index-self.rowsize-1, index-self.rowsize, index-self.rowsize+1,
@@ -30,17 +31,17 @@ class Game:
 
     def tick(self):
         states = []
-        for i in range(0, len(self.cells)):
+        for i, cell in enumerate(self.cells):
             n = self.get_alive_neighbors(i)
-            if not self.cells[i].alive and n == 3:
+            if not cell.alive and n == 3:
                 states.append(True)
-            elif self.cells[i].alive and (n == 2 or n == 3):
+            elif cell.alive and (n == 2 or n == 3):
                 states.append(True)
             else:
                 states.append(False)
-        for i in range(0, len(self.cells)):
-            self.cells[i].alive = states[i]
-            self.cells[i].display()
+        for i, cell in enumerate(self.cells):
+            cell.alive = states[i]
+            cell.display()
         time.sleep(self.tickperiod)
 
     def start(self):
@@ -59,8 +60,8 @@ class Game:
 class Cell:
     def __init__(self, parent, x, y):
         self.alive = False
-        self.width = 20
-        self.height = 20
+        self.width = 30
+        self.height = 30
         self.position = (x, y)
         self.frame = tkinter.Frame(parent, width=self.width, height=self.height, background="grey", borderwidth=1,
                                    relief="solid")
@@ -87,8 +88,8 @@ if __name__ == "__main__":
     window.minsize(window_width, window_height)
 
     grid = tkinter.Frame(window)
-    num_rows = 10
-    num_cols = 10
+    num_rows = 20
+    num_cols = 20
     cells = []
     for y in range(num_rows):
         for x in range(num_cols):
